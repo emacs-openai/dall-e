@@ -301,6 +301,7 @@ Display buffer from BUFFER-OR-NAME."
     (lv-message
      (concat
       (format "session: %s" (cdr dall-e-instance)) "\n"
+      (format "images: %s" (length dall-e-images))
       "\n\n"
       (format "n: %s" dall-e-n) "\n"
       (format "size: %s" dall-e-size) "\n"
