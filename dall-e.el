@@ -90,6 +90,9 @@ Must be one of `256x256', `512x512', or `1024x1024'."
 (defvar-local dall-e-spinner-timer nil
   "Spinner timer.")
 
+(defvar-local dall-e-tip-inserted-p nil
+  "Use to erase tip after first input.")
+
 (defface dall-e-user
   '((t :inherit font-lock-builtin-face))
   "Face used for user."
@@ -208,15 +211,36 @@ Display buffer from BUFFER-OR-NAME."
 ;;
 ;;; Input
 
+(defun dall-e--fill-region (start end)
+  "Like function `fill-region' (START to END), improve readability."
+  (save-restriction
+    (narrow-to-region start end)
+    (goto-char (point-min))
+    (while (not (eobp))
+      (end-of-line)
+      (when (< fill-column (current-column))
+        (fill-region (line-beginning-position) (line-end-position)))
+      (forward-line 1))))
+
 (defun dall-e-send-response (prompt)
-  "Send PROMPT to ChatGPT."
+  "Send PROMPT to DALL-E."
   (let ((user (dall-e-user))
         (instance dall-e-instance)
         (cache-dir (dall-e-cache-dir)))
     (when (string-empty-p prompt)
       (user-error "[INFO] Invalid prompt or description: %s" prompt))
     (dall-e-with-instance instance
-      (chatgpt--display-messages))        ; display it
+      ;; clear up the tip message
+      (when dall-e-tip-inserted-p
+        (erase-buffer)
+        (setq dall-e-tip-inserted-p nil))
+      ;; Display input
+      (let ((start (point))
+            (role (format "<%s>:" user)))
+        (add-face-text-property 0 (length role) 'dall-e-user nil role)
+        (insert role " " prompt)
+        (insert "\n\n")
+        (dall-e--fill-region start (point))))
     (setq dall-e-requesting-p t)
     (dall-e--start-spinner)
     (openai-image prompt
@@ -318,6 +342,7 @@ Display buffer from BUFFER-OR-NAME."
 (defun dall-e-mode-insert-tip ()
   "Insert tip to output buffer."
   (when (string-empty-p (buffer-string))
+    (setq dall-e-tip-inserted-p t)
     (let ((inhibit-read-only t)
           (tip "Press <return> to start entering detailed description
 
