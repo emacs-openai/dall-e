@@ -395,7 +395,6 @@ Display buffer from BUFFER-OR-NAME."
       (add-face-text-property 0 (length tip) 'dall-e-tip nil tip)
       (insert tip))))
 
-;;;###autoload
 (define-derived-mode dall-e-mode fundamental-mode "DALL-E"
   "Major mode for `dall-e-mode'.
 
