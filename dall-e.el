@@ -32,6 +32,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'image)
 (require 'let-alist)
 (require 'subr-x)
 
@@ -48,7 +49,7 @@
   :group 'comm
   :link '(url-link :tag "Repository" "https://github.com/emacs-openai/dall-e"))
 
-(defcustom dall-e-n 1
+(defcustom dall-e-n 5
   "The number of images to generate.  Must be between 1 and 10."
   :type 'integer
   :group 'dall-e)
@@ -71,6 +72,11 @@ Must be one of `256x256', `512x512', or `1024x1024'."
   "Absolute path to download image files."
   :risky t
   :type 'directory
+  :group 'dall-e)
+
+(defcustom dall-e-display-width 200
+  "The image size to display in buffer."
+  :type 'integer
   :group 'dall-e)
 
 (defconst dall-e-buffer-name-format "*DALL-E: <%s>*"
@@ -226,6 +232,18 @@ Display buffer from BUFFER-OR-NAME."
         (fill-region (line-beginning-position) (line-end-position)))
       (forward-line 1))))
 
+(defun dall-e--display-image (data)
+  "Display image DATA in place."
+  (goto-char (point-max))
+  (let ((filename (car data))
+        (url      (cdr data))
+        (start    (point)))
+    (insert url)
+    (add-text-properties start (point)  ; hover url, so you can click on it!
+                         `(display ,(create-image filename nil nil
+                                                  :width dall-e-display-width)))
+    (insert " ")))
+
 (defun dall-e-send-response (prompt)
   "Send PROMPT to DALL-E."
   (let ((user (dall-e-user))
@@ -234,6 +252,7 @@ Display buffer from BUFFER-OR-NAME."
     (when (string-empty-p prompt)
       (user-error "[INFO] Invalid prompt or description: %s" prompt))
     (dall-e-with-instance instance
+      (goto-char (point-max))
       ;; clear up the tip message
       (when dall-e-tip-inserted-p
         (erase-buffer)
@@ -254,16 +273,19 @@ Display buffer from BUFFER-OR-NAME."
                       (dall-e--cancel-spinner-timer)
                       (unless openai-error
                         (ignore-errors (make-directory cache-dir t))
+                        (clear-image-cache)
                         (let-alist data
                           (mapc (lambda (images-data)
                                   (let-alist images-data
                                     (let* ((url .url)
-                                           (name (file-name-nondirectory url))
-                                           (abs (expand-file-name name cache-dir)))
-                                      (url-copy-file name cache-dir)
-                                      (push (cons abs url) dall-e-images))))
+                                           (name (format "%s.png" (length dall-e-images)))
+                                           (filename (expand-file-name name cache-dir))
+                                           (data (cons filename url)))
+                                      (url-copy-file url filename)
+                                      (push data dall-e-images)
+                                      (dall-e--display-image data))))
                                 .data))
-                        )))
+                        (insert "\n\n"))))
                   :n dall-e-n
                   :size dall-e-size
                   :user user)))

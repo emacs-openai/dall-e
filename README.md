@@ -8,6 +8,10 @@ Use DALL-E inside Emacs
 
 [![CI](https://github.com/emacs-openai/dall-e/actions/workflows/test.yml/badge.svg)](https://github.com/emacs-openai/dall-e/actions/workflows/test.yml)
 
+## 🔗 References
+
+- [chatgpt-shell](https://github.com/xenodium/chatgpt-shell)
+
 ## Contribute
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
