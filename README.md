@@ -7,7 +7,7 @@ Use DALL-E inside Emacs
 [![CI](https://github.com/emacs-openai/dall-e/actions/workflows/test.yml/badge.svg)](https://github.com/emacs-openai/dall-e/actions/workflows/test.yml)
 
 <p align="center">
-<img alt="demo" src="./etc/demo.gif"/>
+<img alt="demo" src="./etc/demo.gif" width="50%"/>
 </p>
 
 ## 💾 Installation
