@@ -2,7 +2,7 @@
 [![JCS-ELPA](https://raw.githubusercontent.com/jcs-emacs/badges/master/elpa/v/dall-e.svg)](https://jcs-emacs.github.io/jcs-elpa/#/dall-e)
 
 # dall-e
-Use DALL-E inside Emacs
+> Use DALL-E inside Emacs
 
 [![CI](https://github.com/emacs-openai/dall-e/actions/workflows/test.yml/badge.svg)](https://github.com/emacs-openai/dall-e/actions/workflows/test.yml)
 
