@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "dall-e"
          "0.1.0"
          "Use DALL-E inside Emacs")
